@@ -1,12 +1,10 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "861b8e0fbe2d800d6a6aac9e949e629675d2d494ae8b6e838764a4d89f94fa74"
+            "sha256": "a9603f60714c630d1d6b725ce05c3123ba05319f148c41c65c7cdbca93ad8205"
         },
         "pipfile-spec": 6,
-        "requires": {
-            "python_version": "2.7"
-        },
+        "requires": {},
         "sources": [
             {
                 "name": "pypi",
@@ -23,13 +21,6 @@
             ],
             "index": "pypi",
             "version": "==0.5.5"
-        },
-        "django": {
-            "hashes": [
-                "sha256:c096bafbea10e7d359bc15eb00a9bf11dbf5201a16d62acfa2de61d5a35488e9"
-            ],
-            "index": "pypi",
-            "version": "==1.4"
         },
         "funcsigs": {
             "hashes": [

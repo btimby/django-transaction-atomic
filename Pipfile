@@ -3,12 +3,6 @@ name = "pypi"
 verify_ssl = true
 url = "https://pypi.org/simple"
 
-[dev-packages]
-
 [packages]
-django = "==1.4"
 "contextlib2" = "==0.5.5"
-mock = "2.0.0"
-
-[requires]
-python_version = "2.7"
+mock = "==2.0.0"
