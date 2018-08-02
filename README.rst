@@ -8,7 +8,7 @@ for nesting of transactions in Django 1.4 & 1.5.
 Example
 -------
 
-..code:: python
+.. code:: python
 
     from django_transaction_atomic import atomic
 
