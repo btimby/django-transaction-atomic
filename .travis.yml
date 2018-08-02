@@ -43,6 +43,7 @@ matrix:
     - python: "3.6"
       env: DJANGO=1.7
 install:
+  - pip install pipenv
   - pipenv install --system Django==$DJANGO
   - pipenv install --system
 script:
