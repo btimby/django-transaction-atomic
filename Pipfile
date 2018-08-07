@@ -5,4 +5,5 @@ url = "https://pypi.org/simple"
 
 [packages]
 "contextlib2" = "==0.5.5"
-mock = "==2.0.0"
+mock = "==1.1.2"
+django = "==1.6"
