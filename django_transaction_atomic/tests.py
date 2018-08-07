@@ -1,7 +1,9 @@
 try:
-    from django import __version__ as django_version
-except ImportError:
     from django import VERSION as django_version
+
+except ImportError:
+    from django import __version__ as django_version
+    django_version = list(map(int, django_version.split('.')[:2]))
 
 from django.db import connection
 from django.test import TestCase
@@ -10,6 +12,7 @@ from unittest import skipIf
 
 try:
     from unittest import mock
+
 except ImportError:
     import mock
 
