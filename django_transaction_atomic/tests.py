@@ -6,7 +6,7 @@ except ImportError:
     django_version = list(map(int, django_version.split('.')[:2]))
 
 from django.db import connection
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 
 from unittest import skipIf
 
@@ -31,7 +31,7 @@ def _function():
 
 
 @skipIf(not _supports_atomic(), 'Atomic support is not built in')
-class DefaultTestCase(TestCase):
+class DefaultTestCase(TransactionTestCase):
     """
     Test Case for Django with built-in atomic.
     """
@@ -39,9 +39,13 @@ class DefaultTestCase(TestCase):
     def test_import(self):
         # Import "real" implementation.
         from django.db.transaction import atomic as _atomic
+        from django.db.transaction import commit as _commit
+        from django.db.transaction import rollback as _rollback
 
         # Ensure the originals are used.
         self.assertEqual(atomic, _atomic)
+        self.assertEqual(commit, _commit)
+        self.assertEqual(rollback, _rollback)
 
 
 @skipIf(_supports_atomic(), 'Atomic support is built in')
