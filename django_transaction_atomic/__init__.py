@@ -9,4 +9,4 @@ try:
 
 except ImportError:
     # Import our implementation.
-    from _atomic import *
+    from ._atomic import *

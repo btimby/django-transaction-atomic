@@ -36,13 +36,9 @@ class DefaultTestCase(TestCase):
     def test_import(self):
         # Import "real" implementation.
         from django.db.transaction import atomic as _atomic
-        from django.db.transaction import commit as _commit
-        from django.db.transaction import rollback as _rollback
 
         # Ensure the originals are used.
         self.assertEqual(atomic, _atomic)
-        self.assertEqual(commit, _commit)
-        self.assertEqual(rollback, _rollback)
 
 
 @skipIf(_supports_atomic(), 'Atomic support is built in')
