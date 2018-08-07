@@ -1,4 +1,6 @@
 # Import common items.
+from __future__ import absolute_import
+
 from django.db.transaction import (
     commit, rollback, savepoint, savepoint_commit, savepoint_rollback
 )
