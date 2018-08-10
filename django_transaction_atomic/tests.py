@@ -6,7 +6,6 @@ except ImportError:
     django_version = list(map(int, django_version.split('.')[:2]))
 
 from django.db import connection
-from django.test import TestCase, TransactionTestCase
 
 from unittest import skipIf
 
@@ -17,6 +16,8 @@ except ImportError:
     import mock
 
 from . import atomic, commit, rollback
+from .test import TestCase, TransactionTestCase
+from .models import Model1
 
 
 def _supports_atomic():
@@ -73,3 +74,23 @@ class BackportTestCase(TestCase):
 
         with atomic():
             wrapped()
+
+
+class BleedoverTestCase(TestCase):
+    """
+    Test Case for test isolation.
+    """
+
+    def test_one(self):
+        # First create an object.
+        Model1.objects.create(name='1: does it bleed?')
+
+        # Then ensure only that object exists.
+        self.assertEqual(1, Model1.objects.all().count())
+
+    def test_two(self):
+        # First create an object.
+        Model1.objects.create(name='2: does it bleed?')
+
+        # Then ensure only that object exists.
+        self.assertEqual(1, Model1.objects.all().count())
