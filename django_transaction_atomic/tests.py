@@ -16,7 +16,9 @@ except ImportError:
     import mock
 
 from . import atomic, commit, rollback
-from .test import TestCase, TransactionTestCase
+from .test import (
+    TestCase, TransactionTestCase, connections_support_transactions
+)
 from .models import Model1
 
 
@@ -57,7 +59,6 @@ class BackportTestCase(TestCase):
 
     def test_decorator(self):
         wrapped = atomic(_function)
-
         wrapped()
 
     def test_nested_fun(self):
@@ -82,6 +83,33 @@ class BleedoverTestCase(TestCase):
     """
 
     def test_one(self):
+        self.assertTrue(connections_support_transactions())
+
+        # First create an object.
+        Model1.objects.create(name='1: does it bleed?')
+
+        # Then ensure only that object exists.
+        self.assertEqual(1, Model1.objects.all().count())
+        import pdb; pdb.set_trace()
+
+    def test_two(self):
+        self.assertTrue(connections_support_transactions())
+
+        # First create an object.
+        Model1.objects.create(name='2: does it bleed?')
+
+        # Then ensure only that object exists.
+        self.assertEqual(1, Model1.objects.all().count())
+
+
+class TransactionBleedoverTestCase(TransactionTestCase):
+    """
+    Test Case for transaction test isolation.
+    """
+
+    def test_one(self):
+        self.assertTrue(connections_support_transactions())
+
         # First create an object.
         Model1.objects.create(name='1: does it bleed?')
 
@@ -89,6 +117,8 @@ class BleedoverTestCase(TestCase):
         self.assertEqual(1, Model1.objects.all().count())
 
     def test_two(self):
+        self.assertTrue(connections_support_transactions())
+
         # First create an object.
         Model1.objects.create(name='2: does it bleed?')
 

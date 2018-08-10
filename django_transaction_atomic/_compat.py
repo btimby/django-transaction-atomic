@@ -28,6 +28,15 @@ except ImportError:
         pass
 
 
+from django.db.transaction import TransactionManagementError
+
+
+def setattrdefault(obj, name, value):
+    if hasattr(obj, name):
+        return
+    setattr(obj, name, value)
+
+
 class ProxyDatabaseFeatures(object):
     """
     Proxy DatabaseFeatures and augment with properties from later versions of
@@ -39,7 +48,7 @@ class ProxyDatabaseFeatures(object):
 
         # TODO: features should depend on the backend, these values are for
         # MySQL.
-        setattr(features, 'autocommits_when_autocommit_is_off', False)
+        setattrdefault(features, 'autocommits_when_autocommit_is_off', False)
 
     def __getattr__(self, name):
         return getattr(self._features, name)
@@ -59,14 +68,15 @@ class ProxyDatabaseWrapper(object):
     def __init__(self, connection):
         self._connection = connection
 
-        setattr(connection, 'in_atomic_block', False)
-        setattr(connection, 'autocommit', False)
-        setattr(connection, 'closed_in_transaction', False)
-        setattr(connection, 'savepoint_ids', [])
+        setattrdefault(connection, 'in_atomic_block', False)
+        setattrdefault(connection, 'autocommit', False)
+        setattrdefault(connection, 'closed_in_transaction', False)
+        setattrdefault(connection, 'savepoint_ids', [])
+        setattrdefault(connection, 'needs_rollback', False)
 
         # Proxy features as well.
-        setattr(connection, 'features',
-                ProxyDatabaseFeatures(connection.features))
+        setattrdefault(connection, 'features',
+                       ProxyDatabaseFeatures(connection.features))
 
     def __getattr__(self, name):
         return getattr(self._connection, name)
@@ -83,3 +93,9 @@ class ProxyDatabaseWrapper(object):
                        force_begin_transaction_with_broken_autocommit=False):
         # TODO: actually implement this.
         self.autocommit = True
+
+    def set_rollback(self, rollback):
+        if not self.in_atomic_block:
+            raise TransactionManagementError(
+                "The rollback flag doesn't work outside of an 'atomic' block.")
+        self.needs_rollback = rollback
