@@ -90,7 +90,6 @@ class BleedoverTestCase(TestCase):
 
         # Then ensure only that object exists.
         self.assertEqual(1, Model1.objects.all().count())
-        import pdb; pdb.set_trace()
 
     def test_two(self):
         self.assertTrue(connections_support_transactions())

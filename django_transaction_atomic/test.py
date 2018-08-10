@@ -107,7 +107,6 @@ if transaction.atomic == _atomic:
             self.atomics = self._enter_atomics()
 
         def _fixture_teardown(self):
-            import pdb; pdb.set_trace()
             if not connections_support_transactions():
                 return super(TestCase, self)._fixture_teardown()
             try:
