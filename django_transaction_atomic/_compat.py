@@ -1,5 +1,6 @@
 # Thin compatability layer for different versions of Django. Allows new Django
 # atomic implementation to work without changes.
+from __future__ import absolute_import
 
 try:
     from django.utils.decorators import ContextDecorator

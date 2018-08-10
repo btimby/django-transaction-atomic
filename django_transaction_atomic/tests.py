@@ -1,15 +1,18 @@
 try:
-    from django import __version__ as django_version
-except ImportError:
     from django import VERSION as django_version
 
+except ImportError:
+    from django import __version__ as django_version
+    django_version = list(map(int, django_version.split('.')[:2]))
+
 from django.db import connection
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 
 from unittest import skipIf
 
 try:
     from unittest import mock
+
 except ImportError:
     import mock
 
@@ -28,7 +31,7 @@ def _function():
 
 
 @skipIf(not _supports_atomic(), 'Atomic support is not built in')
-class DefaultTestCase(TestCase):
+class DefaultTestCase(TransactionTestCase):
     """
     Test Case for Django with built-in atomic.
     """

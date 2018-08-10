@@ -1,12 +1,6 @@
-from django.conf.urls import patterns, include, url
+try:
+    from django.conf.urls import patterns
+    urlpatterns = patterns('')
 
-from django.contrib import admin
-admin.autodiscover()
-
-urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'django_transaction_atomic.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
-
-    url(r'^admin/', include(admin.site.urls)),
-)
+except ImportError:
+    urlpatterns = []

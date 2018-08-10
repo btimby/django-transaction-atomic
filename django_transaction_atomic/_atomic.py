@@ -1,9 +1,10 @@
 # Django 1.11.15 stock implementation... Only change is to get_connection()
+from __future__ import absolute_import
 
 from django.db import (
     DEFAULT_DB_ALIAS, DatabaseError, connections,
 )
-from _compat import (
+from ._compat import (
     ContextDecorator, Error, ProgrammingError, ProxyDatabaseWrapper
 )
 
