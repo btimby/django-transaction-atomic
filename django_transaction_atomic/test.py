@@ -100,14 +100,8 @@ if transaction.atomic == _atomic:
 
             self.atomics = self._enter_atomics()
 
-            # Django <= 1.5 need this.
-            # disable_transaction_methods()
-
         def _fixture_teardown(self):
             return super(TestCase, self)._fixture_teardown()
-
-            # Django <= 1.5 need this.
-            # restore_transaction_methods()
 
             try:
                 if hasattr(self, '_should_check_constraints'):
