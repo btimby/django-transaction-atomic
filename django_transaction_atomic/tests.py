@@ -16,7 +16,7 @@ try:
 except ImportError:
     import mock
 
-from . import atomic, commit, rollback, get_connection
+from . import atomic, commit, rollback
 from .test import connections_support_transactions
 from .models import Model1
 
@@ -40,7 +40,7 @@ class DefaultTestCase(TransactionTestCase):
     """
 
     def test_import(self):
-        """Test that patching was NOT done."""
+        """Test that patching was done."""
         # Import "real" implementation.
         from django.db.transaction import atomic as _atomic
         from django.db.transaction import commit as _commit
@@ -137,6 +137,7 @@ class TransactionBleedoverTestCase(TransactionTestCase):
         self.assertEqual(1, Model1.objects.all().count())
 
 
+@skipIf(_supports_atomic(), 'Atomic support is built in')
 class ProxyTestCase(TestCase):
     """
     Test Case for Database / Features Proxies.
@@ -144,5 +145,7 @@ class ProxyTestCase(TestCase):
 
     def test_features(self):
         """Test that features is accessible."""
+        from . import get_connection
+
         connection = get_connection()
         self.assertTrue(connection.features.supports_select_related)
