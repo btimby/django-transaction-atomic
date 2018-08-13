@@ -64,20 +64,18 @@ if transaction.atomic == _atomic:
 
             if hasattr(cls, 'fixtures'):
                 for db_name in cls._databases_names(include_mirrors=False):
-                        try:
-                            call_command('loaddata', *cls.fixtures, **{
-                                'verbosity': 0,
-                                'commit': False,
-                                'database': db_name,
-                            })
-                        except Exception:
-                            cls._rollback_atomics(cls.cls_atomics)
-                            raise
+                    try:
+                        call_command('loaddata', *cls.fixtures, **{
+                            'verbosity': 0,
+                            'commit': False,
+                            'database': db_name,
+                        })
+                    except Exception:
+                        cls._rollback_atomics(cls.cls_atomics)
+                        raise
             try:
                 cls.setUpTestData()
-            except AttributeError:
-                pass
-            except Exception as e:
+            except Exception:
                 cls._rollback_atomics(cls.cls_atomics)
                 raise
 
@@ -95,20 +93,22 @@ if transaction.atomic == _atomic:
             pass
 
         def _fixture_setup(self):
-            if not connections_support_transactions():
-                # If the backend does not support transactions, we should
-                # reload class data before each test
-                self.setUpTestData()
-                return super(TestCase, self)._fixture_setup()
+            return super(TestCase, self)._fixture_setup()
 
             assert not getattr(self, 'reset_sequences', False), \
                 'reset_sequences cannot be used on TestCase instances'
 
             self.atomics = self._enter_atomics()
 
+            # Django <= 1.5 need this.
+            # disable_transaction_methods()
+
         def _fixture_teardown(self):
-            if not connections_support_transactions():
-                return super(TestCase, self)._fixture_teardown()
+            return super(TestCase, self)._fixture_teardown()
+
+            # Django <= 1.5 need this.
+            # restore_transaction_methods()
+
             try:
                 if hasattr(self, '_should_check_constraints'):
                     for db_name in reversed(self._databases_names()):
