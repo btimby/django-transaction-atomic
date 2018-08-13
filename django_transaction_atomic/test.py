@@ -1,11 +1,17 @@
 
+from __future__ import absolute_import
+
 from django.core.management import call_command
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.test import TransactionTestCase
 from django.test import TestCase as BaseTestCase
 
-import _atomic as transaction
-from ._atomic import atomic as _atomic
+try:
+    from django.db.transaction import atomic as _atomic
+except ImportError:
+    _atomic = None
+
+from ._atomic import atomic
 
 
 def connections_support_transactions():
@@ -16,7 +22,7 @@ def connections_support_transactions():
                for conn in connections.all())
 
 
-if transaction.atomic == _atomic:
+if _atomic == atomic:
 
     # If we are using our backported atomic decorator, then we must provide a
     # backported TestCase to go with it.
@@ -43,7 +49,7 @@ if transaction.atomic == _atomic:
             """Helper method to open atomic blocks for multiple databases"""
             atomics = {}
             for db_name in cls._databases_names():
-                atomics[db_name] = transaction.atomic(using=db_name)
+                atomics[db_name] = atomic(using=db_name)
                 atomics[db_name].__enter__()
             return atomics
 
