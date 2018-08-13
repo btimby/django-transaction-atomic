@@ -62,7 +62,7 @@ if transaction.atomic == _atomic:
 
             cls.cls_atomics = cls._enter_atomics()
 
-            if hasattr(cls, 'fixtures'):
+            if getattr(cls, 'fixtures', None) is not None:
                 for db_name in cls._databases_names(include_mirrors=False):
                     try:
                         call_command('loaddata', *cls.fixtures, **{
