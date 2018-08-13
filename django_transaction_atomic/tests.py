@@ -16,12 +16,13 @@ try:
 except ImportError:
     import mock
 
-from . import atomic, commit, rollback
+from . import atomic, commit, rollback, get_connection
 from .test import connections_support_transactions
 from .models import Model1
 
 
 def _supports_atomic():
+    """Return True if Django version requires patching."""
     return django_version[:2] >= (1, 6)
 
 
@@ -39,6 +40,7 @@ class DefaultTestCase(TransactionTestCase):
     """
 
     def test_import(self):
+        """Test that patching was NOT done."""
         # Import "real" implementation.
         from django.db.transaction import atomic as _atomic
         from django.db.transaction import commit as _commit
@@ -57,10 +59,12 @@ class BackportTestCase(TestCase):
     """
 
     def test_decorator(self):
+        """Test atomic used as wrapper."""
         wrapped = atomic(_function)
         wrapped()
 
     def test_nested_fun(self):
+        """Test nested atomic usage as wrapper and decorator."""
         wrapped = atomic(_function)
 
         @atomic
@@ -70,6 +74,7 @@ class BackportTestCase(TestCase):
         nesting()
 
     def test_nested_ctx(self):
+        """Test atomic used as context manager."""
         wrapped = atomic(_function)
 
         with atomic():
@@ -82,6 +87,7 @@ class BleedoverTestCase(TestCase):
     """
 
     def test_one(self):
+        """Ensure objects do not bleed over between tests."""
         self.assertTrue(connections_support_transactions())
 
         with atomic():
@@ -92,6 +98,7 @@ class BleedoverTestCase(TestCase):
         self.assertEqual(1, Model1.objects.all().count())
 
     def test_two(self):
+        """Ensure objects do not bleed over between tests."""
         self.assertTrue(connections_support_transactions())
 
         with atomic():
@@ -108,6 +115,7 @@ class TransactionBleedoverTestCase(TransactionTestCase):
     """
 
     def test_one(self):
+        """Ensure objects do not bleed over between tests."""
         self.assertTrue(connections_support_transactions())
 
         with atomic():
@@ -118,6 +126,7 @@ class TransactionBleedoverTestCase(TransactionTestCase):
         self.assertEqual(1, Model1.objects.all().count())
 
     def test_two(self):
+        """Ensure objects do not bleed over between tests."""
         self.assertTrue(connections_support_transactions())
 
         with atomic():
@@ -126,3 +135,14 @@ class TransactionBleedoverTestCase(TransactionTestCase):
 
         # Then ensure only that object exists.
         self.assertEqual(1, Model1.objects.all().count())
+
+
+class ProxyTestCase(TestCase):
+    """
+    Test Case for Database / Features Proxies.
+    """
+
+    def test_features(self):
+        """Test that features is accessible."""
+        connection = get_connection()
+        self.assertTrue(connection.features.supports_select_related)
