@@ -52,14 +52,18 @@ def setattrdefault(obj, name, value):
 
 
 def patch_is_managed(obj):
-    try:
-        original_is_managed = obj.is_managed
-    except AttributeError:
-        original_is_managed = lambda: False
-
     def is_managed(self):
         is_managed = original_is_managed()
         return is_managed or self.in_atomic_block
+
+    try:
+        if obj.is_managed == is_managed:
+            return
+
+    except AttributeError:
+        original_is_managed = lambda: False
+    else:
+        original_is_managed = obj.is_managed
 
     obj.is_managed = types.MethodType(is_managed, obj)
 
