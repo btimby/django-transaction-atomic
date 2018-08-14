@@ -122,8 +122,8 @@ class ProxyDatabaseWrapper(object):
 
         elif isinstance(self._connection, MySQLDatabaseWrapper):
             sql = "SHOW GLOBAL VARIABLES LIKE 'AUTOCOMMIT'"
-            C = self._connection.cursor()
 
+            C = self._connection.cursor()
             try:
                 C.execute(sql)
                 return C.fetchone()[1] in ('ON', '1')
@@ -137,22 +137,24 @@ class ProxyDatabaseWrapper(object):
     def set_autocommit(self, autocommit,
                        force_begin_transaction_with_broken_autocommit=False):
         if isinstance(self._connection, SqliteDatabaseWrapper):
-            if autocommit:
-                self._connection.connection.isolation_level = None
+            self._connection.connection.isolation_level = \
+                None if autocommit else ''
 
         elif isinstance(self._connection, MySQLDatabaseWrapper):
             sql = 'SET AUTOCOMMIT='
             sql += '1' if autocommit else '0'
-            C = self._connection.cursor()
 
+            C = self._connection.cursor()
             try:
                 C.execute(sql)
 
             finally:
                 C.close()
 
-        raise NotImplementedError('set_autocommit() not implemented for '
-                                  'backend: %s' % self._connection.__class__)
+        else:
+            raise NotImplementedError(
+                'set_autocommit() not implemented for '
+                'backend: %s' % self._connection.__class__)
 
     def set_rollback(self, rollback):
         if not self.in_atomic_block:

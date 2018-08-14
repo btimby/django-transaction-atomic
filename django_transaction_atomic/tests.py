@@ -161,7 +161,6 @@ class CrossVersionTransactionTestCase(TransactionTestCase):
         Test that saved objects are rolled back on an error.
         """
         with self.assertRaises(Exception):
-            import pdb; pdb.set_trace()
             with atomic():
                 Model1.objects.create(name='I should be rolled back.')
                 raise Exception()
