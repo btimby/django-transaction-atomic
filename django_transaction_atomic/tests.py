@@ -149,3 +149,49 @@ class ProxyTestCase(TestCase):
 
         connection = get_connection()
         self.assertTrue(connection.features.supports_select_related)
+
+
+class CrossVersionTransactionTestCase(TransactionTestCase):
+    """
+    Test Case for Django 1.4/5 with atomic.
+    """
+
+    def test_rollback(self):
+        """
+        Test that saved objects are rolled back on an error.
+        """
+        with self.assertRaises(Exception):
+            import pdb; pdb.set_trace()
+            with atomic():
+                Model1.objects.create(name='I should be rolled back.')
+                raise Exception()
+
+        self.assertEqual(0, Model1.objects.all().count())
+
+    def test_cross_versions(self):
+        """
+        Test that new and old transaction handling work together.
+        """
+        try:
+            from django.db.transaction import commit_unless_managed
+        except ImportError:
+            return
+
+        class Sentinal(Exception):
+            pass
+
+        @atomic
+        def new():
+            old()
+            Model1.objects.create(name='Inside new atomic transaction')
+            raise Sentinal()
+
+        def old():
+            Model1.objects.create(name='Inside old school transaction')
+            # This should NOT commit!
+            commit_unless_managed()
+
+        with self.assertRaises(Sentinal):
+            new()
+
+        self.assertEqual(0, Model1.objects.all().count())
